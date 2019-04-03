@@ -14,6 +14,9 @@ class SQSPoller:
     def __init__(self, options):
         self.options = options
         self.sqs_client = boto3.client('sqs', region_name=options.aws_region)
+        if not self.options.sqs_queue_url:
+        # Derive the URL from the queue name
+        self.options.sqs_queue_url = self.sqs_client.get_queue_url(QueueName=self.options.sqs_queue_name)['QueueUrl']
         config.load_incluster_config()
         self.apps_v1 = client.AppsV1Api()
         self.last_scale_up_time = time()
